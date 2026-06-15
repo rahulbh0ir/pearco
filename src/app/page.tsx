@@ -16,7 +16,7 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.home}>
+    <main className={styles.home}>
 
       <div className={styles.content}>
         <h2>Pearcall</h2>
@@ -30,6 +30,6 @@ export default function Home() {
         <button onClick={handleClick}>Join</button>
       </div>
 
-    </div>
+    </main>
   );
 }
