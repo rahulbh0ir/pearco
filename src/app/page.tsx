@@ -1,17 +1,18 @@
 "use client"
 
-
 import { useState } from "react";
 import styles from "./home.module.css"
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
 
   const [id, setId] = useState("");
+  const router = useRouter();
 
-  const handleClick = () => {
-    console.log(id)
-    setId("")
+  const handleClick = () => {  
+    router.push(`/room/${id}`);
+    setId("");
   }
 
   return (
