@@ -1,0 +1,39 @@
+.home {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.content{
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 10px;
+}
+
+.content h2 {
+  color: lightgreen;
+}
+
+.content input {
+  padding: 5px;
+  width: 200px;
+  height: 50px;
+}
+
+.content button{
+  border: 1px solid gray;
+  background-color: lightgreen;
+  color: white;
+  cursor: pointer;
+  width: 100px;
+  height: 30px;
+}
+
+.content button:hover {
+  background-color: limegreen;
+}
