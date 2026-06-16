@@ -1,6 +1,6 @@
 "use client"
 import { useEffect } from "react"
-import styles from "../room.module.css"
+import styles from "./room.module.css"
 
 
 
@@ -27,6 +27,13 @@ export default ({
   }, [])
 
 
+  const handleStop = () => {
+    const localVideo = document.querySelector("#localVideo") as HTMLVideoElement;
+    localVideo.srcObject = null;
+  }
+
+
+
   return (
     <main className={styles.room}>
       <h2>Room : {id}</h2>
@@ -35,6 +42,7 @@ export default ({
         <video id="localVideo" autoPlay playsInline controls={false}></video>
         <video id="remoteVideo" autoPlay playsInline controls={false}></video>
       </section>
+
     </main>
   )
 }
