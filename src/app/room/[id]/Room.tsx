@@ -1,21 +1,29 @@
 "use client"
-
-import { useEffect } from "react";
+import { useEffect } from "react"
 import styles from "../room.module.css"
 
 
-export default function Room ({ id } : {id : string}) {
+
+export default ({
+  id }: {
+    id: string
+  }) => {
 
   useEffect(() => {
-    
-    const getVideo = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      const localVideo = document.getElementById("localVideo") as HTMLVideoElement;
+
+    const getStream = async () => {
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      })
+
+      const localVideo = document.querySelector("#localVideo") as HTMLVideoElement;
       localVideo.srcObject = stream;
     }
 
-    getVideo();
-  
+    getStream()
+
   }, [])
 
 
@@ -27,7 +35,7 @@ export default function Room ({ id } : {id : string}) {
         <video id="localVideo" autoPlay playsInline controls={false}></video>
         <video id="remoteVideo" autoPlay playsInline controls={false}></video>
       </section>
-
     </main>
   )
 }
+

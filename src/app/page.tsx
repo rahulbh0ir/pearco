@@ -1,18 +1,19 @@
 "use client"
-
-import { useState } from "react";
+import { useState } from "react"
 import styles from "./home.module.css"
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 
 
-export default function Home() {
+export default () => {
 
-  const [id, setId] = useState("");
-  const router = useRouter();
+  const [id , setId] = useState("")
+  const router = useRouter()
 
-  const handleClick = () => {  
-    router.push(`/room/${id}`);
-    setId("");
+
+  const submit = () => {
+    console.log(id);
+    router.push(`/room/${id}`)
+    setId("")
   }
 
   return (
@@ -20,16 +21,23 @@ export default function Home() {
 
       <section className={styles.content}>
         <h2>Pearcall</h2>
+
         <input
-          id="roomId"
           type="text"
           placeholder="Enter a room name"
           onChange={(e) => setId(e.target.value)}
           value={id}
-        />
-        <button onClick={handleClick}>Join</button>
-      </section>
+          required
+          />
 
+        <input
+          className={styles.btn}
+          type="submit"
+          value="Join"
+          onClick={() => submit()}
+          />
+
+      </section>
     </main>
-  );
+  )
 }
