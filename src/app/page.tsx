@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <main className={styles.home}>
 
-      <div className={styles.content}>
+      <section className={styles.content}>
         <h2>Pearcall</h2>
         <input
           id="roomId"
@@ -28,7 +28,7 @@ export default function Home() {
           value={id}
         />
         <button onClick={handleClick}>Join</button>
-      </div>
+      </section>
 
     </main>
   );

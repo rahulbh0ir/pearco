@@ -1,11 +1,16 @@
+import Room from "./Room"
 
-export default async ({params} : {params : Promise<{id : string}>}) => {
+export default async ({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) => {
 
-  const { id } = await params;
+  const { id } = await params
+
+  console.log(id);
 
   return (
-    <>
-      <h2>Room : {id}</h2>
-    </>
+    <Room id={id} />
   )
 }
