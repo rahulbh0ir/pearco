@@ -8,8 +8,6 @@ export default async ({
 
   const { id } = await params;
 
-  console.log(id)
-
   return (
     <Room id = {id}/>
   )

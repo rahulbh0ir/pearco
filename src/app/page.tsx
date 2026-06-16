@@ -11,7 +11,6 @@ export default () => {
 
 
   const submit = () => {
-    console.log(id);
     router.push(`/room/${id}`)
     setId("")
   }
