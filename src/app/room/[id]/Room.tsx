@@ -1,7 +1,7 @@
 "use client"
+
 import { useEffect } from "react"
 import styles from "./room.module.css"
-
 
 
 export default ({
@@ -25,13 +25,6 @@ export default ({
     getStream()
 
   }, [])
-
-
-  const handleStop = () => {
-    const localVideo = document.querySelector("#localVideo") as HTMLVideoElement;
-    localVideo.srcObject = null;
-  }
-
 
 
   return (
