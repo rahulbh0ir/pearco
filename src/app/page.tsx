@@ -1,7 +1,9 @@
 "use client"
-import { useState } from "react"
-import styles from "./home.module.css"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import styles from "./home.module.css";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Logo from "../../public/logo.png"
 
 
 export default () => {
@@ -19,7 +21,14 @@ export default () => {
     <main className={styles.home}>
 
       <section className={styles.content}>
-        <h2>Pearcall</h2>
+        <Image 
+          src={Logo}
+          alt="Website logo"
+          width={50}
+          height={50}
+          loading="eager"
+        />
+        <h2>Pearco</h2>
 
         <input
           type="text"

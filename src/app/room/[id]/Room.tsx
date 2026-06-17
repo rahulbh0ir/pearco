@@ -12,17 +12,25 @@ export default ({
   useEffect(() => {
 
     const getStream = async () => {
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
       })
-
       const localVideo = document.querySelector("#localVideo") as HTMLVideoElement;
       localVideo.srcObject = stream;
     }
 
+    
+    const makeCall = async () => {
+      const configuration = {"iceServers" : [{'urls' : 'stun:stun.l.google.com:19302'}]};
+      const peerConnection = new RTCPeerConnection(configuration);
+      
+      console.log(peerConnection)
+      
+    } 
+    
     getStream()
+    makeCall()
 
   }, [])
 

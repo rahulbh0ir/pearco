@@ -26,14 +26,14 @@
 }
 
 .btn {
-  border: 1px solid gray;
+  /* width: 60px;
+  height: 30px; */
+  border: 1px solid rgb(204, 203, 203);
   background-color: limegreen;
   color: white;
   cursor: pointer;
-  width: 100px;
-  height: 30px;
 }
 
 .btn:hover {
-  background-color: rgb(38, 162, 38);
+  background-color: rgb(35, 181, 35);
 }
