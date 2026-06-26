@@ -18,25 +18,43 @@
 
 
 .content video {
-  width: 400px;
-  height: 200px;
+  width: 600px;
+  height: 300px;
   background-color: black;
 }
 
+.textArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.textDiv{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
 .textArea button {
-  width: 80px;
-  height: auto; 
+  width: 150px;
+  height: 50px; 
+  background-color: lightcoral;
+  color: white;
+  border: 2px solid ghostwhite;
   cursor: pointer;
 }
 
+.textArea button:hover {
+  background-color: lightsalmon;
+}
 
 #offer {
-  width: 400px;
-  height: 100px;
+  width: 600px;
+  height: 200px;
 }
 
 #answer {
-  width: 400px;
-  height: 100px;
+  width: 600px;
+  height: 200px;
 }

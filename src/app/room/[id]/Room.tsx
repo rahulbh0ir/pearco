@@ -1,25 +1,24 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 import styles from "./room.module.css"
 
-
 export default ({
-  id }: {
-    id: string
-  }) => {
+  id
+}: {
+  id: string
+}) => {
 
+  const [offer, setOffer] = useState("")
+  const [answer, setAnser] = useState("")
 
-  const offerRef = useRef<HTMLTextAreaElement>(null);
-  const answerRef = useRef<HTMLTextAreaElement>(null);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  // const offerRef = useRef(null)
+  // const answerRef = useRef(null)
 
-  let [offerSdp, setOfferSdp] = useState("");
-  let [answerSdp, setAnswerSdp] = useState("");
-
+  const localRef = useRef<HTMLVideoElement>(null);
+  const remoteRef = useRef<HTMLVideoElement>(null);
   let peerConnection = useRef<RTCPeerConnection | null>(null);
-  let stream = useRef<MediaStream | null>(null);
+  let stream = useRef<MediaStream>(null);
 
   const configuration = {
     "iceServers": [
@@ -33,149 +32,112 @@ export default ({
     ]
   };
 
-
   useEffect(() => {
 
     const getStream = async () => {
+
+      peerConnection.current = await new RTCPeerConnection(configuration);
       stream.current = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
-      });
+      })
 
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream.current;
-      }
-
-      peerConnection.current = await new RTCPeerConnection(configuration);
+      localRef.current!.srcObject = stream.current;
 
       stream.current!.getTracks().forEach(track => {
-        peerConnection.current!.addTrack(track, stream.current!);
-      });
+        peerConnection.current!.addTrack(track, stream.current!)
+      })
 
-      peerConnection.current.ontrack = (event) => {
-        // console.log("Track recieved ", event.streams);
+      peerConnection.current?.addEventListener("track", (event) => {
         if (event.streams) {
-          remoteVideoRef.current!.srcObject = event.streams[0]
+          remoteRef.current!.srcObject = event.streams[0]
         }
-      }
-
+      })
     }
 
-    getStream()
-  }, [])
 
+    getStream()
+
+  }, [])
 
 
   const createOffer = async () => {
 
-    if (offerRef.current?.value) {
-      await peerConnection.current!.setRemoteDescription(JSON.parse(offerRef.current.value));
-      await createAnswer();
+    if (offer !== "") {
+      peerConnection.current?.setRemoteDescription(JSON.parse(offer))
+      createAnswer();
       return
     }
 
-    const offer = await peerConnection.current!.createOffer();
-    await peerConnection.current!.setLocalDescription(offer);
-
-    peerConnection.current!.onicecandidate = event => {
+    const getOffer = await peerConnection.current?.createOffer();
+    peerConnection.current?.setLocalDescription(getOffer)
+    peerConnection.current?.addEventListener("icecandidate", (event) => {
       if (event.candidate) {
-        setOfferSdp(JSON.stringify(peerConnection.current?.localDescription))
+        setOffer(JSON.stringify(peerConnection.current?.localDescription));
       }
-    }
+    })
+
 
   }
-
 
   const createAnswer = async () => {
 
-    const answer = await peerConnection.current!.createAnswer()
-    await peerConnection.current!.setLocalDescription(answer);
-
-    peerConnection.current!.onicecandidate = event => {
-      if (event.candidate) {
-        setAnswerSdp(JSON.stringify(peerConnection.current?.localDescription))
-      }
+    if (answer !== "") {
+      peerConnection.current?.setRemoteDescription(JSON.parse(answer));
+      return
     }
+
+
+    const getAnswer = await peerConnection.current?.createAnswer();
+    peerConnection.current?.setLocalDescription(getAnswer);
+    peerConnection.current?.addEventListener("icecandidate", (event) => {
+      if (event.candidate) {
+        setAnser(JSON.stringify(peerConnection.current?.localDescription))
+      }
+    })
+
   }
 
-
-  const addAnswer = async () => {
-    if (
-      answerRef.current?.value &&
-      peerConnection.current!.signalingState === "have-local-offer"
-    ) {
-      await peerConnection.current!.setRemoteDescription(
-        JSON.parse(answerRef.current.value)
-      );
-      console.log("Answer Added")
-
-
-
-    } else {
-      console.log(
-        "Cannot add answer. Current state:",
-        peerConnection.current!.signalingState
-      );
-    }
-  };
 
 
   return (
     <main className={styles.room}>
+
       <h2>Room : {id}</h2>
 
       <section className={styles.content}>
-        <video
-          ref={localVideoRef}
-          id="localVideo"
-          autoPlay
-          playsInline
-          controls={false}>
-        </video>
-
-        <video
-          ref={remoteVideoRef}
-          id="remoteVideo"
-          autoPlay
-          playsInline
-          controls={false}>
-
-        </video>
+        <video ref={localRef} id="localVideo" autoPlay playsInline></video>
+        <video ref={remoteRef} id="remoteVideo" autoPlay playsInline></video>
       </section>
-
-
-
-
 
       <section className={styles.textArea}>
 
-        <p>SDP Offer</p>
-        <textarea
-          ref={offerRef}
-          name="offer" id={styles.offer}
-          value={offerSdp}
-          onChange={(e) => setOfferSdp(e.target.value)}>
-        </textarea>
-        <button className="offerBtn" onClick={createOffer}>Create Offer</button>
+        <div className={styles.textDiv}>
+          <p>Offer Text</p>
+          <textarea
+            // ref={offerRef}
+            value={offer}
+            id={styles.offer}
+            onChange={(event) => setOffer(event.target.value)}
+          >
+          </textarea>
+          <button onClick={createOffer}>Create Offer</button>
+        </div>
 
-        <p>SDP Answer</p>
-        <textarea
-          ref={answerRef}
-          name="answer"
-          id={styles.answer}
-          value={answerSdp}
-          onChange={(e) => setAnswerSdp(e.target.value)}>
-        </textarea>
-        <button className="answerBtn" onClick={createAnswer}>Create Answer</button>
+        <div className={styles.textDiv}>
+          <p>Answer Text</p>
+          <textarea
+            // ref={answerRef}
+            value={answer}
+            id={styles.answer}
+            onChange={(event) => setAnser(event.target.value)}
+          >
+          </textarea>
+          <button onClick={createAnswer}>Create Answer</button>
+        </div>
 
       </section>
-
-      <section>
-        <button className="addBtn" onClick={addAnswer}>Add Answer</button>
-      </section>
-
 
     </main>
   )
 }
-
