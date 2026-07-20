@@ -9,12 +9,8 @@ export default ({
   id: string
 }) => {
 
-  const [offer, setOffer] = useState("")
-  const [answer, setAnser] = useState("")
-
-  // const offerRef = useRef(null)
-  // const answerRef = useRef(null)
-
+  const [offer, setOffer] = useState("");
+  const [answer, setAnser] = useState("");
   const localRef = useRef<HTMLVideoElement>(null);
   const remoteRef = useRef<HTMLVideoElement>(null);
   let peerConnection = useRef<RTCPeerConnection | null>(null);
