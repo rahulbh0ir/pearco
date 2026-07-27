@@ -1,5 +1,5 @@
 import Room from "./Room"
-
+import Test from './test'
 
 export default async ({
   params }: {
@@ -9,7 +9,8 @@ export default async ({
   const { id } = await params;
 
   return (
-    <Room id = {id}/>
+    // <Room id = {id}/>
+    < Test />
   )
 }
 
