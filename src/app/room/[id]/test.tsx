@@ -14,6 +14,7 @@ export default () => {
 
     const getStream = async () => {
 
+
       let stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
@@ -26,6 +27,14 @@ export default () => {
 
   }, [])
 
+  const socket = async () => {
+
+    const ws = new WebSocket("ws://localhost:8800/ws")
+    ws.onopen = () => {
+      console.log("websocket is open")
+      ws.send("hello")
+    }
+  }
 
   return (
 
@@ -33,7 +42,7 @@ export default () => {
 
       <section className="container">
         <div className="videos">
-          <video ref={localVideo} className="video" id="localVideo" autoPlay playsInline></video>  
+          <video ref={localVideo} className="video" id="localVideo" autoPlay playsInline></video>
         </div>
 
         {toggle ? (
@@ -49,7 +58,7 @@ export default () => {
         <button>Audio</button>
         <button>Video</button>
         <button>Screen</button>
-        <button>End</button>
+        <button onClick={socket}>End</button>
         <button onClick={() => setToggle(toggle = !toggle)}>Chat</button>
       </section>
 
