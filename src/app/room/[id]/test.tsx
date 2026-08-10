@@ -6,15 +6,21 @@ import "./test.css"
 
 export default () => {
 
+  const ws = useRef<WebSocket | null>(null)
+  let localVideo = useRef<HTMLVideoElement>(null);
   let [toggle, setToggle] = useState(true);
-  let localVideo = useRef<HTMLVideoElement>(null)
-
 
   useEffect(() => {
 
+    const socket = new WebSocket("ws://localhost:8800");
+    ws.current = socket;
+
+    socket.onopen = () => {
+      console.log("Websocket is running...")
+      socket.send("hello")
+    }
+
     const getStream = async () => {
-
-
       let stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
@@ -25,16 +31,17 @@ export default () => {
 
     getStream()
 
+
+
+
+
+
+    return () => {
+      socket.close()
+    }
+
   }, [])
 
-  const socket = async () => {
-
-    const ws = new WebSocket("ws://localhost:8800/ws")
-    ws.onopen = () => {
-      console.log("websocket is open")
-      ws.send("hello")
-    }
-  }
 
   return (
 
@@ -58,7 +65,7 @@ export default () => {
         <button>Audio</button>
         <button>Video</button>
         <button>Screen</button>
-        <button onClick={socket}>End</button>
+        <button>End</button>
         <button onClick={() => setToggle(toggle = !toggle)}>Chat</button>
       </section>
 
