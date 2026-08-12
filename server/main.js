@@ -1,13 +1,27 @@
-
 const { WebSocketServer } = require("ws");
-const wss = new WebSocketServer({ port: 8800 });
 
-console.log("websocket running...");
+const wss = new WebSocketServer({
+    port: 8800
+});
 
-wss.on("connection" , (ws) => {
+wss.on("listening", () => {
+    console.log("✅ WebSocket server is LISTENING on 8800");
+});
 
+wss.on("error", (error) => {
+    console.log("❌ WebSocket server error:", error);
+});
 
-  ws.on("message" ,(message) => {
-    console.log(message.toString())
-  })
-})
+wss.on("connection", (ws) => {
+
+    console.log("✅ CLIENT CONNECTED");
+
+    ws.on("message", (message) => {
+        console.log("📩 received:", message.toString());
+    });
+
+    ws.on("close", () => {
+        console.log("❌ CLIENT DISCONNECTED");
+    });
+
+});

@@ -6,9 +6,12 @@ import "./test.css"
 
 export default () => {
 
-  const ws = useRef<WebSocket | null>(null)
+  const ws = useRef<WebSocket | null>(null);
   let localVideo = useRef<HTMLVideoElement>(null);
+  let stream = useRef<MediaStream | null>(null)
   let [toggle, setToggle] = useState(true);
+
+
 
   useEffect(() => {
 
@@ -16,17 +19,25 @@ export default () => {
     ws.current = socket;
 
     socket.onopen = () => {
-      console.log("Websocket is running...")
-      socket.send("hello")
-    }
+      console.log("✅ CLIENT: WebSocket connected");
+      socket.send("hello");
+    };
+
+    socket.onerror = (error) => {
+      console.log("❌ CLIENT: WebSocket error", error);
+    };
+
+    socket.onclose = (event) => {
+      console.log("❌ CLIENT: WebSocket closed", event.code);
+    };
 
     const getStream = async () => {
-      let stream = await navigator.mediaDevices.getUserMedia({
+      stream.current = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false
       })
 
-      localVideo.current!.srcObject = stream
+      localVideo.current!.srcObject = stream.current
     }
 
     getStream()
@@ -34,10 +45,15 @@ export default () => {
 
 
 
-
-
     return () => {
+      
+      // close websocket
       socket.close()
+      
+      // close camera and audio
+      stream.current?.getTracks().forEach(track => track.stop());
+      stream.current = null;
+    
     }
 
   }, [])
