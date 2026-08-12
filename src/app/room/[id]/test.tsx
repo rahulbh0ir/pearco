@@ -6,28 +6,28 @@ import "./test.css"
 
 export default () => {
 
-  const ws = useRef<WebSocket | null>(null);
-  let localVideo = useRef<HTMLVideoElement>(null);
-  let stream = useRef<MediaStream | null>(null)
+  const socket = useRef<WebSocket | null>(null)
+  const stream = useRef<MediaStream | null>(null)
+  const localVideo = useRef<HTMLVideoElement>(null);
+
   let [toggle, setToggle] = useState(true);
 
 
 
   useEffect(() => {
 
-    const socket = new WebSocket("ws://localhost:8800");
-    ws.current = socket;
+    socket.current = new WebSocket("ws://localhost:8800");
 
-    socket.onopen = () => {
+    socket.current.onopen = () => {
       console.log("✅ CLIENT: WebSocket connected");
-      socket.send("hello");
+      socket.current!.send("hello");
     };
 
-    socket.onerror = (error) => {
+    socket.current.onerror = (error) => {
       console.log("❌ CLIENT: WebSocket error", error);
     };
 
-    socket.onclose = (event) => {
+    socket.current.onclose = (event) => {
       console.log("❌ CLIENT: WebSocket closed", event.code);
     };
 
@@ -48,7 +48,7 @@ export default () => {
     return () => {
       
       // close websocket
-      socket.close()
+      socket.current!.close()
       
       // close camera and audio
       stream.current?.getTracks().forEach(track => track.stop());
