@@ -4,7 +4,7 @@ const wss = new WebSocketServer({
 });
 
 let clients = new Map();
-let rooms = new Map(); 
+let rooms = new Map();
 
 
 
@@ -29,11 +29,23 @@ wss.on("connection", (ws) => {
 
     clients.set(id, ws)
 
-    
+
 
     ws.on("message", (message) => {
         room = JSON.parse(message)
         console.log("📩 Room :", room);
+
+        if (!rooms.has(room)) {
+            rooms.set(room, new Set());
+        }
+        if (rooms.get(room).size == 2) {
+            ws.send("Room is full")
+            return
+        }
+        rooms.get(room).add(id);
+
+        console.log(rooms)
+
     });
 
 
@@ -42,8 +54,10 @@ wss.on("connection", (ws) => {
 
 
 
-    ws.on("close", () => {
+    ws.on("close", (ws) => {
         console.log("❌ CLIENT DISCONNECTED");
+        clients.delete(id);
+        rooms.get(room).delete(id)
     });
 
 });
