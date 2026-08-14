@@ -10,7 +10,7 @@ export default async ({
 
   return (
     // <Room id = {id}/>
-    < Test />
+    <Test id = {id} />
   )
 }
 

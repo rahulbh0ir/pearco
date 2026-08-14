@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react"
 import "./test.css"
 
 
-export default () => {
+export default ({
+  id
+}: {
+  id: string
+}) => {
 
   const socket = useRef<WebSocket | null>(null)
   const stream = useRef<MediaStream | null>(null)
@@ -20,8 +24,14 @@ export default () => {
 
     socket.current.onopen = () => {
       console.log("✅ CLIENT: WebSocket connected");
-      socket.current!.send("hello");
+      socket.current!.send(id);
     };
+
+
+    socket.current.onmessage = (msg) => {
+      console.log("✅ CLIENT ID :" , msg.data)
+    }
+
 
     socket.current.onerror = (error) => {
       console.log("❌ CLIENT: WebSocket error", error);
@@ -30,6 +40,11 @@ export default () => {
     socket.current.onclose = (event) => {
       console.log("❌ CLIENT: WebSocket closed", event.code);
     };
+
+
+
+
+    
 
     const getStream = async () => {
       stream.current = await navigator.mediaDevices.getUserMedia({
@@ -46,14 +61,14 @@ export default () => {
 
 
     return () => {
-      
+
       // close websocket
       socket.current!.close()
-      
+
       // close camera and audio
       stream.current?.getTracks().forEach(track => track.stop());
       stream.current = null;
-    
+
     }
 
   }, [])
