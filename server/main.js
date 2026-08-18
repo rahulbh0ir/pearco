@@ -8,9 +8,13 @@ let rooms = new Map();
 
 
 
-// const broadcast = () => {
-
-// }
+const broadcast = (uuid, type, id, payload) => {
+    rooms.get(id).forEach(value => {
+        if (value !== uuid) {
+            clients.get(value).send(JSON.stringify({ type: "offer", id: uuid, payload: payload }))
+        }
+    })
+}
 
 
 wss.on("listening", () => {
@@ -37,19 +41,28 @@ wss.on("connection", (ws) => {
 
         room = id
 
-        // console.log(type, id, payload);
-        console.log("📩 Room :", room);
+        // console.log("📩 Room :", room);
+
 
         if (!rooms.has(room)) {
             rooms.set(room, new Set());
         }
-        if (rooms.get(room).size == 2) {
-            ws.send("Room is full")
-            return
-        }
+
         rooms.get(room).add(uuid);
 
         console.log(rooms)
+
+        if (type === "offer") {
+            broadcast(uuid, type, id, payload)
+        }
+
+
+        if (rooms.get(room).size == 2) {
+            ws.send(JSON.stringify({
+                type: "full",
+                payload: "Room is full"
+            }))
+        }
 
     });
 
@@ -73,5 +86,12 @@ wss.on("connection", (ws) => {
         }
 
     });
+
+
+
+    ws.send(JSON.stringify({
+        type: "welcome",
+        payload: uuid
+    }))
 
 });
