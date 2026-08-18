@@ -24,15 +24,20 @@ wss.on("error", (error) => {
 
 
 wss.on("connection", (ws) => {
-    const id = crypto.randomUUID()
+    const uuid = crypto.randomUUID()
     let room;
 
-    clients.set(id, ws)
+    clients.set(uuid, ws)
 
 
 
     ws.on("message", (message) => {
-        room = JSON.parse(message)
+        let data = JSON.parse(message)
+        const { type, id, payload } = data;
+
+        room = id
+
+        // console.log(type, id, payload);
         console.log("📩 Room :", room);
 
         if (!rooms.has(room)) {
@@ -42,7 +47,7 @@ wss.on("connection", (ws) => {
             ws.send("Room is full")
             return
         }
-        rooms.get(room).add(id);
+        rooms.get(room).add(uuid);
 
         console.log(rooms)
 
@@ -55,9 +60,18 @@ wss.on("connection", (ws) => {
 
 
     ws.on("close", (ws) => {
-        console.log("❌ CLIENT DISCONNECTED");
-        clients.delete(id);
-        rooms.get(room).delete(id)
+        console.log("❌ CLIENT DISCONNECTED : ", uuid);
+        clients.delete(uuid);
+
+        if (room && rooms.get(room)) {
+
+            rooms.get(room).delete(uuid)
+
+            if (rooms.get(room).size == 0) {
+                rooms.delete(room)
+            }
+        }
+
     });
 
 });

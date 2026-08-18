@@ -16,20 +16,34 @@ export default ({
 
   let [toggle, setToggle] = useState(true);
 
+  interface datatype {
+    type: string,
+    payload: string
+  }
+
+  const send = ({ type, payload }: datatype) => {
+    socket.current!.send(JSON.stringify({ type, id, payload }))
+  }
 
 
   useEffect(() => {
 
     socket.current = new WebSocket("ws://localhost:8800");
 
+
+
     socket.current.onopen = () => {
       console.log("✅ CLIENT: WebSocket connected");
-      socket.current!.send(id);
+      // socket.current!.send(room);
+      send({
+        type: "join",
+        payload: "hello"
+      })
     };
 
 
     socket.current.onmessage = (msg) => {
-      console.log("✅ CLIENT ID :" , msg.data)
+      console.log("✅ CLIENT ID :", msg.data)
     }
 
 
@@ -44,7 +58,7 @@ export default ({
 
 
 
-    
+
 
     const getStream = async () => {
       stream.current = await navigator.mediaDevices.getUserMedia({
