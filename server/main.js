@@ -11,7 +11,7 @@ let rooms = new Map();
 const broadcast = (uuid, type, id, payload) => {
     rooms.get(id).forEach(value => {
         if (value !== uuid) {
-            clients.get(value).send(JSON.stringify({ type: "offer", id: uuid, payload: payload }))
+            clients.get(value).send(JSON.stringify({ type: type, id: uuid, payload: payload }))
         }
     })
 }
@@ -36,33 +36,50 @@ wss.on("connection", (ws) => {
 
 
     ws.on("message", (message) => {
+
+        // console.log("📩 Room :", room);
+
         let data = JSON.parse(message)
         const { type, id, payload } = data;
 
         room = id
 
-        // console.log("📩 Room :", room);
+
+        if (type === "join") {
+
+            if (!rooms.has(room)) {
+                rooms.set(room, new Set());
+            }
+            rooms.get(room).add(uuid);
 
 
-        if (!rooms.has(room)) {
-            rooms.set(room, new Set());
+            if (rooms.get(room).size == 2) {
+                // ws.send(JSON.stringify({
+                //     type: "offerer",
+                //     payload: "send the offer"
+                // }))
+
+                broadcast(uuid, "offerer", id, "send the offer")
+
+            }
         }
-
-        rooms.get(room).add(uuid);
-
-        console.log(rooms)
 
         if (type === "offer") {
             broadcast(uuid, type, id, payload)
         }
 
-
-        if (rooms.get(room).size == 2) {
-            ws.send(JSON.stringify({
-                type: "full",
-                payload: "Room is full"
-            }))
+        if (type === "answer") {
+            broadcast(uuid, type, id, payload)
         }
+
+        if (type === "icecandidate") {
+            broadcast(uuid, type, id, payload)
+        }
+
+
+        // console.log("Rooms : ", rooms.get(room).values().next().value);
+        console.log(rooms)
+
 
     });
 

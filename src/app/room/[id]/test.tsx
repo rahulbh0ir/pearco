@@ -22,7 +22,7 @@ export default ({
     ]
   };
   const socket = useRef<WebSocket | null>(null)
-  const peerConnection = useRef<RTCPeerConnection | null>(null)
+  const peer = useRef<RTCPeerConnection | null>(null)
 
   const stream = useRef<MediaStream | null>(null)
   const localVideo = useRef<HTMLVideoElement>(null);
@@ -32,7 +32,7 @@ export default ({
 
   interface datatype {
     type: string,
-    payload: object | string
+    payload: any
   }
 
   const send = ({ type, payload }: datatype) => {
@@ -41,6 +41,57 @@ export default ({
       socket.current!.send(JSON.stringify({ type, id, payload }))
     }
 
+  }
+
+  const peerConnection = async () => {
+    if (peer.current) {
+      return
+    }
+
+    peer.current = new RTCPeerConnection(configuration);
+
+
+
+
+    peer.current.addEventListener("track", (event) => {
+      remoteVideo.current!.srcObject = event.streams[0]
+    })
+
+    peer.current.addEventListener("icecandidate", (event) => {
+
+      if (event.candidate) {
+        send({
+          type: "icecandidate",
+          payload: event.candidate
+        })
+      }
+    })
+
+  }
+
+
+
+  const createOffer = async () => {
+
+    let offer = await peer.current!.createOffer();
+    await peer.current!.setLocalDescription(offer);
+
+    send({
+      type: "offer",
+      payload: offer
+    })
+
+  };
+
+
+  const createAnswer = async () => {
+    const answer = await peer.current?.createAnswer();
+    await peer.current!.setLocalDescription(answer);
+
+    send({
+      type: "answer",
+      payload: answer
+    })
   }
 
 
@@ -52,16 +103,17 @@ export default ({
     socket.current = new WebSocket("ws://localhost:8800");
 
     socket.current.onopen = () => {
+
       console.log("✅ CLIENT: WebSocket connected");
-      // socket.current!.send(room);
+
       send({
         type: "join",
-        payload: "hello"
+        payload: "This could be username"
       })
     };
 
 
-    socket.current.onmessage = (msg) => {
+    socket.current.onmessage = async (msg) => {
       // console.log("✅ CLIENT ID :", msg.data);
       const { type, id, payload } = JSON.parse(msg.data);
 
@@ -69,15 +121,31 @@ export default ({
         console.log("✅ CLIENT ID :", payload)
       }
 
-      if(type === "offer") {
-        console.log("Offer : ", payload , id)
-      }
-
-
-      if (type === "full") {
+      if (type === "offerer") {
+        createOffer();
         console.log(payload)
       }
 
+
+      if (type === "offer") {
+        console.log("offer :", payload);
+
+        await peerConnection()
+        await peer.current!.setRemoteDescription(payload);
+        createAnswer()
+      }
+
+      if (type === "answer") {
+        console.log("Answer :", payload)
+
+        await peer.current?.setRemoteDescription(payload)
+      }
+
+
+      if (type === "icecandidate") {
+        console.log("IceCandidate : ", payload)
+        await peer.current?.addIceCandidate(new RTCIceCandidate(payload))
+      }
 
 
     }
@@ -98,7 +166,7 @@ export default ({
 
     const getStream = async () => {
 
-      peerConnection.current = new RTCPeerConnection(configuration);
+      await peerConnection();
 
       stream.current = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -106,20 +174,13 @@ export default ({
       })
 
       localVideo.current!.srcObject = stream.current;
-
-      let offer = await peerConnection.current.createOffer();
-      peerConnection.current.setLocalDescription(offer);
-
-      send({
-        type: "offer",
-        payload: offer
-      })
-
+      stream.current.getTracks().forEach(track => peer.current?.addTrack(track, stream.current!))
 
 
     }
 
     getStream()
+
 
 
 
@@ -145,6 +206,8 @@ export default ({
       <section className="container">
         <div className="videos">
           <video ref={localVideo} className="video" id="localVideo" autoPlay playsInline></video>
+          <video ref={remoteVideo} className="video" id="remoteVideo" autoPlay playsInline></video>
+
         </div>
 
         {toggle ? (
