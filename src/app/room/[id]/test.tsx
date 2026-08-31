@@ -78,7 +78,7 @@ export default ({
 
     send({
       type: "offer",
-      payload: offer
+      payload: peer.current?.localDescription
     })
 
   };
@@ -123,12 +123,12 @@ export default ({
 
       if (type === "offerer") {
         createOffer();
-        console.log(payload)
+        // console.log(payload)
       }
 
 
       if (type === "offer") {
-        console.log("offer :", payload);
+        console.log("Offer :", payload);
 
         await peerConnection()
         await peer.current!.setRemoteDescription(payload);
@@ -188,11 +188,20 @@ export default ({
     return () => {
 
       // close websocket
-      socket.current!.close()
-
+      socket.current?.close();
+      socket.current = null;
+      
+      
+      peer.current?.close();
+      peer.current= null;
+      
+      
+      
       // close camera and audio
+      
       stream.current?.getTracks().forEach(track => track.stop());
       stream.current = null;
+      
 
     }
 

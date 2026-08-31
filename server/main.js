@@ -62,18 +62,23 @@ wss.on("connection", (ws) => {
                 broadcast(uuid, "offerer", id, "send the offer")
 
             }
+            
+            return;
         }
 
         if (type === "offer") {
-            broadcast(uuid, type, id, payload)
+            broadcast(uuid, type, id, payload);
+            return;
         }
 
         if (type === "answer") {
-            broadcast(uuid, type, id, payload)
+            broadcast(uuid, type, id, payload);
+            return;
         }
 
         if (type === "icecandidate") {
-            broadcast(uuid, type, id, payload)
+            broadcast(uuid, type, id, payload);
+            return;
         }
 
 
